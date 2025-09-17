@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "files": ["../../app.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "../../app.d.ts"],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ],
+  "compilerOptions": {
+    "types": ["nativewind/types"]
+  }
+}
