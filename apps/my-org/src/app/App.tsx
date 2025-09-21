@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Header from './components/Header';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Task = {
   id: string;
@@ -24,13 +24,13 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const isInitialLoadRef = useRef(true);
 
-  useEffect(()=>{
-    const loadTasks=async()=>{
-      try{
-        const saved=await AsyncStorage.getItem("tasks");
-        if(saved) setTasks(JSON.parse(saved));
-      }catch(e){
-        console.error("failed to load tasks", e);
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const saved = await AsyncStorage.getItem('tasks');
+        if (saved) setTasks(JSON.parse(saved));
+      } catch (e) {
+        console.error('failed to load tasks', e);
       }
     };
     loadTasks();
@@ -87,7 +87,7 @@ export default function App() {
       </View>
       <FlatList
         data={tasks}
-  keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <View style={styles.taskcontainer}>
             <TouchableOpacity
