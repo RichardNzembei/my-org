@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { nanoid } from 'nanoid';
 
 import {
   View,
@@ -21,6 +22,7 @@ type Task = {
 export default function App() {
   const [task, setTask] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
+  const isInitialLoadRef = useRef(true);
 
   useEffect(()=>{
     const loadTasks=async()=>{
@@ -34,22 +36,26 @@ export default function App() {
     loadTasks();
   }, []);
 
-  useEffect(()=>{
-    const saveTasks=async()=>{
-      try{
-        await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
-      }catch(e){
-        console.error("failed to save tasks", e);
+  useEffect(() => {
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      return;
+    }
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+      } catch (e) {
+        console.error('Failed to save tasks.', e);
       }
     };
     saveTasks();
-  },[tasks]);
+  }, [tasks]);
 
   const addTask = () => {
     if (task.trim() === '') return;
 
     const newTask: Task = {
-      id: Date.now().toString(),
+      id: nanoid(),
       title: task,
       completed: false,
     };
@@ -81,15 +87,25 @@ export default function App() {
       </View>
       <FlatList
         data={tasks}
-        keyExtractor={(item) => item.id}
+  keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <View style={styles.taskcontainer}>
-            <TouchableOpacity onPress={() => toggleTask(item.id)}>
+            <TouchableOpacity
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Toggle ${item.title}`}
+              accessibilityState={{ checked: item.completed }}
+              onPress={() => toggleTask(item.id)}
+            >
               <Text style={[styles.task, item.completed && styles.completed]}>
                 {item.title}
               </Text>
             </TouchableOpacity>
-            <Button title="❌" onPress={() => deleteTask(item.id)} />
+            <Button
+              title="Delete"
+              accessibilityLabel={`Delete ${item.title}`}
+              onPress={() => deleteTask(item.id)}
+            />
           </View>
         )}
       />

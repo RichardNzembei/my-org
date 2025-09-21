@@ -7,17 +7,18 @@ type HeaderProps = {
 };
 
 export default function Header({title, subtitle}: HeaderProps){
-  return(
+  return (
     <View style={styles.container}>
-  <Text style={styles.title}>{title}</Text>
-       <Text style={styles.subtitle}>{subtitle}</Text>
+      <Text style={styles.title}>{title}</Text>
+      {subtitle ? (
+        <Text style={styles.subtitle}>{subtitle}</Text>
+      ) : null}
     </View>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
