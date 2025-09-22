@@ -1,62 +1,61 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { nanoid } from 'nanoid';
+import React, { useState } from "react";
+import { View, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, Text } from "react-native";
+import Header from "./components/Header";
+import { TaskProvider, useTasksContext } from "./context/TasksContext";
 
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Button,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
-import Header from './components/Header';
-import {useTasks} from "./hooks/useTasks";
-
-
-
-export default function App() {
-  const [task, setTask] = useState('');
-  const {tasks, addTask, toggleTask, deleteTask} = useTasks();
+function TaskList() {
+  const { tasks, toggleTask, deleteTask } = useTasksContext();
 
   return (
-    <View style={styles.container}>
-      <Header title="Pocket Tasks" subtitle="Your personal tasks manager" />
+    <FlatList
+      data={tasks}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <View style={styles.taskContainer}>
+          <TouchableOpacity onPress={() => toggleTask(item.id)}>
+            <Text style={[styles.task, item.completed && styles.completed]}>
+              {item.title}
+            </Text>
+          </TouchableOpacity>
+          <Button title="❌" onPress={() => deleteTask(item.id)} />
+        </View>
+      )}
+    />
+  );
+}
 
-      <View style={styles.inputcontainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter a task ..."
-          value={task}
-          onChangeText={setTask}
-        />
-        <Button title="Add Task" onPress={()=>{addTask(task); setTask("");}} />
-      </View>
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <View style={styles.taskcontainer}>
-            <TouchableOpacity
-              accessible={true}
-              accessibilityRole="button"
-              accessibilityLabel={`Toggle ${item.title}`}
-              accessibilityState={{ checked: item.completed }}
-              onPress={() => toggleTask(item.id)}
-            >
-              <Text style={[styles.task, item.completed && styles.completed]}>
-                {item.title}
-              </Text>
-            </TouchableOpacity>
-            <Button
-              title="Delete"
-              accessibilityLabel={`Delete ${item.title}`}
-              onPress={() => deleteTask(item.id)}
-            />
-          </View>
-        )}
+function TaskInput() {
+  const [task, setTask] = useState("");
+  const { addTask } = useTasksContext();
+
+  return (
+    <View style={styles.inputContainer}>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter a task..."
+        value={task}
+        onChangeText={setTask}
+      />
+      <Button
+        title="Add"
+        onPress={() => {
+          addTask(task);
+          setTask("");
+        }}
       />
     </View>
+  );
+}
+
+export default function App() {
+  return (
+    <TaskProvider>
+      <View style={styles.container}>
+        <Header title="📱 Pocket Tasks" subtitle="Your personal task manager" />
+        <TaskInput />
+        <TaskList />
+      </View>
+    </TaskProvider>
   );
 }
 
@@ -66,8 +65,8 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
-  inputcontainer: {
-    flexDirection: 'row',
+  inputContainer: {
+    flexDirection: "row",
     marginBottom: 20,
   },
   input: {
@@ -76,20 +75,18 @@ const styles = StyleSheet.create({
     marginRight: 10,
     padding: 5,
   },
-  taskcontainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  taskContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 8,
     borderBottomWidth: 0.5,
   },
   task: {
     fontSize: 18,
-    padding: 8,
-    color: 'blue',
   },
   completed: {
-    textDecorationLine: 'line-through',
-    color: 'gray',
+    textDecorationLine: "line-through",
+    color: "gray",
   },
 });

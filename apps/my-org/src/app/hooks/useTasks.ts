@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-type Task = {
+export type Task = {
   id: string;
   title: string;
   completed: boolean;
@@ -34,7 +33,7 @@ export function useTasks() {
     saveTasks();
   }, [tasks]);
 
-  const addTask = (title:string) => {
+  const addTask = (title: string) => {
     if (title.trim() === '') return;
 
     const newTask: Task = {
@@ -54,5 +53,5 @@ export function useTasks() {
     setTasks(tasks.filter((t) => t.id !== id));
   };
 
-  return {tasks, addTask, toggleTask, deleteTask};
+  return { tasks, addTask, toggleTask, deleteTask };
 }
