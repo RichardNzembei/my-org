@@ -11,66 +11,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Header from './components/Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useTasks} from "./hooks/useTasks";
 
-type Task = {
-  id: string;
-  title: string;
-  completed: boolean;
-};
+
 
 export default function App() {
   const [task, setTask] = useState('');
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const isInitialLoadRef = useRef(true);
-
-  useEffect(() => {
-    const loadTasks = async () => {
-      try {
-        const saved = await AsyncStorage.getItem('tasks');
-        if (saved) setTasks(JSON.parse(saved));
-      } catch (e) {
-        console.error('failed to load tasks', e);
-      }
-    };
-    loadTasks();
-  }, []);
-
-  useEffect(() => {
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
-      return;
-    }
-    const saveTasks = async () => {
-      try {
-        await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
-      } catch (e) {
-        console.error('Failed to save tasks.', e);
-      }
-    };
-    saveTasks();
-  }, [tasks]);
-
-  const addTask = () => {
-    if (task.trim() === '') return;
-
-    const newTask: Task = {
-      id: nanoid(),
-      title: task,
-      completed: false,
-    };
-    setTasks([...tasks, newTask]);
-    setTask('');
-  };
-  const toggleTask = (id: string) => {
-    setTasks(
-      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
-  };
-
-  const deleteTask = (id: string) => {
-    setTasks(tasks.filter((t) => t.id !== id));
-  };
+  const {tasks, addTask, toggleTask, deleteTask} = useTasks();
 
   return (
     <View style={styles.container}>
@@ -83,7 +30,7 @@ export default function App() {
           value={task}
           onChangeText={setTask}
         />
-        <Button title="Add Task" onPress={addTask} />
+        <Button title="Add Task" onPress={()=>{addTask(task); setTask("");}} />
       </View>
       <FlatList
         data={tasks}
